@@ -1,2 +1,6 @@
-# bet_tournament_tg_bot
-tg interface for bet_tournament
+## Public api endpoints
+
+#### POST /tgsend?token={token}
+#### Body params:
+1) chat_ids: list[int]
+2) message: str
