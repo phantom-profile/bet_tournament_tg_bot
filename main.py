@@ -2,7 +2,9 @@ from dataclasses import dataclass, field
 from time import sleep
 
 from flask import Flask, request
-from bot import bot, env_variables
+
+from bot import bot
+from config import env_variables
 
 
 app = Flask(__name__)

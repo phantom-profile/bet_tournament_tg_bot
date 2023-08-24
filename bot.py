@@ -1,8 +1,8 @@
 import telebot
 from telebot.types import Message
-from dotenv import dotenv_values
 
-env_variables = dotenv_values(".env")
+from config import env_variables
+
 
 bot = telebot.TeleBot(env_variables.get('TG_BOT_TOKEN'), parse_mode=None)
 

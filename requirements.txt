@@ -2,3 +2,4 @@ pytelegrambotapi
 flask
 python-dotenv==1.0.0
 flake8
+requests
