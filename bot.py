@@ -10,7 +10,7 @@ bot = telebot.TeleBot(env_variables.get('TG_BOT_TOKEN'), parse_mode=None)
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message: Message):
     print(message.chat.id)
-    bot.reply_to(message, "salam alleykum, ebana!")
+    bot.reply_to(message, "hello world!")
 
 
 if __name__ == '__main__':
