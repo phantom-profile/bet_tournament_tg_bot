@@ -1,5 +1,5 @@
 from config import env_variables
-from clients.base_client import BaseClient
+from lib.base_client import BaseClient
 
 
 class BackendClient(BaseClient):
