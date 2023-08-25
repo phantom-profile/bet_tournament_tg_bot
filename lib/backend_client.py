@@ -1,3 +1,5 @@
+import random
+
 from config import env_variables
 from lib.base_client import BaseClient
 
@@ -7,4 +9,4 @@ class BackendClient(BaseClient):
     TOKEN = env_variables.get('BACKEND_TOKEN')
 
     def in_current_tournament(self, user_id) -> bool:
-        return True
+        return random.choice([True, False])
