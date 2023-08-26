@@ -13,7 +13,10 @@ bot = TeleBot(env_variables.get('TG_BOT_TOKEN'), parse_mode=None)
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message: Message):
-    print(message.chat.id)
+    if Red.exists(f"lock-interface-{message.from_user.id}"):
+        bot.send_message(message.from_user.id, locale.read('pay_proof_message'))
+        return
+
     initial_info(message.chat.id, bot)
 
 
@@ -27,11 +30,11 @@ def message_reply(message: Message):
     if message.text == locale.read('rules'):
         rules_info(message.chat.id, bot)
     elif message.text == locale.read('register'):
-        init_registration(message, bot)
+        init_registration(message.from_user.id, bot)
     elif message.text == locale.read('status'):
-        check_status(message.chat.id, message.from_user.id, bot)
+        check_status(message.from_user.id, bot)
     elif message.text == locale.read('request_pay_proof'):
-        block_interface(message, bot)
+        block_interface(message.from_user.id, bot)
 
 
 @bot.message_handler(content_types=['document'])
