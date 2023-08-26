@@ -60,6 +60,28 @@ def send_welcome(message: Message):
     bot.send_message(message.chat.id, locale.read('start'), reply_markup=start_keyboard())
 
 
+def perform_registration(message: Message):
+    client = BackendClient()
+    if not client.is_registration_opened():
+        return bot.send_message(
+            message.chat.id,
+            locale.read('registration_closed'),
+            reply_markup=participant_keyboard()
+        )
+    if client.in_current_tournament(message.from_user.id):
+        return bot.send_message(
+            message.chat.id,
+            locale.read('already_participate'),
+            reply_markup=participant_keyboard()
+        )
+    bot.send_message(message.chat.id, locale.read('register_instruction'), reply_markup=init_payment_keyboard())
+
+
+def block_interface(message: Message):
+    bot.send_message(message.chat.id, locale.read('pay_proof_message'))
+    Red.set(f"lock-interface-{message.from_user.id}", "true")
+
+
 @bot.message_handler(content_types=['text'])
 def message_reply(message: Message):
     print(message.text)
@@ -70,25 +92,11 @@ def message_reply(message: Message):
     if message.text == locale.read('rules'):
         bot.send_message(message.chat.id, locale.read('rules_faq'))
     elif message.text == locale.read('register'):
-        client = BackendClient()
-        if not client.is_registration_opened():
-            return bot.send_message(
-                message.chat.id,
-                locale.read('registration_closed'),
-                reply_markup=participant_keyboard()
-            )
-        if client.in_current_tournament(message.from_user.id):
-            return bot.send_message(
-                message.chat.id,
-                locale.read('already_participate'),
-                reply_markup=participant_keyboard()
-            )
-        bot.send_message(message.chat.id, locale.read('register_instruction'), reply_markup=init_payment_keyboard())
+        perform_registration(message)
     elif message.text == locale.read('status'):
         check_status(message)
     elif message.text == locale.read('request_pay_proof'):
-        bot.send_message(message.chat.id, locale.read('pay_proof_message'))
-        Red.set(f"lock-interface-{message.from_user.id}", "true")
+        block_interface(message)
 
 
 @bot.message_handler(content_types=['document'])
