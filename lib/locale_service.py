@@ -7,5 +7,5 @@ class LocaleService:
     def __init__(self):
         self.messages = load(open(BASE_DIR / 'locale.json'))[LOCALE]
 
-    def read(self, key):
+    def read(self, key: str) -> str:
         return self.messages[key]
