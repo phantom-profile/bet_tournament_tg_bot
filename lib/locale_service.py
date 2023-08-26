@@ -1,11 +1,9 @@
 from json import load
 
-from config import BASE_DIR, LOCALE
-
 
 class LocaleService:
-    def __init__(self):
-        self.messages = load(open(BASE_DIR / 'locale.json'))[LOCALE]
+    def __init__(self, locale_path, locale: str):
+        self.messages = load(locale_path.open())[locale]
 
     def read(self, key: str) -> str:
         return self.messages[key]
