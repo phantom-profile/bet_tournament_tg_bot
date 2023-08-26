@@ -1,21 +1,20 @@
 from telebot import TeleBot
 
 from bot_app.ui_components import participant_keyboard, start_keyboard
+from bot_app.user import User
 from config import locale
-from lib.backend_client import BackendClient
 
 
-def check_status(user_id: int, bot: TeleBot):
-    print('user id', user_id)
-    client = BackendClient()
-    if client.in_current_tournament(user_id):
+def check_status(user: User, bot: TeleBot):
+    print('user id', user.id)
+    if user.is_participant:
         return bot.send_message(
-            user_id,
-            locale.read('participant'),
+            user.id,
+            locale.read('already_participate'),
             reply_markup=participant_keyboard()
         )
 
-    bot.send_message(user_id, locale.read('viewer'), reply_markup=start_keyboard())
+    bot.send_message(user.id, locale.read('viewer'), reply_markup=start_keyboard())
 
 
 def initial_info(chat_id: int, bot: TeleBot):

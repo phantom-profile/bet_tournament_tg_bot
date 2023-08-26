@@ -4,6 +4,7 @@ import telebot
 from telebot.types import Message
 
 from bot_app.ui_components import participant_keyboard, init_payment_keyboard, start_keyboard
+from bot_app.user import User
 from config import locale
 from lib.backend_client import BackendClient, Red
 
@@ -31,32 +32,30 @@ def _validate_message(message: Message, client: BackendClient) -> str | None:
         return locale.read('file_size_limit')
 
 
-def init_registration(user_id: int, bot: telebot.TeleBot):
-    client = BackendClient()
-
-    if client.in_current_tournament(user_id):
+def init_registration(user: User, bot: telebot.TeleBot):
+    if user.is_participant:
         return bot.send_message(
-            chat_id=user_id,
+            chat_id=user.id,
             text=locale.read('already_participate'),
             reply_markup=participant_keyboard())
 
-    if not client.is_registration_opened():
+    if not user.client.is_registration_opened():
         return bot.send_message(
-            chat_id=user_id,
+            chat_id=user.id,
             text=locale.read('registration_closed'),
             reply_markup=start_keyboard()
         )
 
     return bot.send_message(
-        chat_id=user_id,
+        chat_id=user.id,
         text=locale.read('register_instruction'),
         reply_markup=init_payment_keyboard()
     )
 
 
-def block_interface(user_id: int, bot: telebot.TeleBot):
-    Red.set(f"lock-interface-{user_id}", "true")
-    return bot.send_message(chat_id=user_id, text=locale.read('pay_proof_message'))
+def block_interface(user: User, bot: telebot.TeleBot):
+    user.block()
+    bot.send_message(chat_id=user.id, text=locale.read('pay_proof_message'))
 
 
 def get_payment_from_user(message: Message, bot: telebot.TeleBot):
