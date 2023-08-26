@@ -1,4 +1,4 @@
-import telebot
+from telebot import TeleBot
 from telebot.types import Message
 
 from bot_app.info_providing import initial_info, check_status, rules_info
@@ -8,7 +8,7 @@ from config import env_variables, locale
 from lib.base_client import Red
 
 
-bot = telebot.TeleBot(env_variables.get('TG_BOT_TOKEN'), parse_mode=None)
+bot = TeleBot(env_variables.get('TG_BOT_TOKEN'), parse_mode=None)
 
 
 @bot.message_handler(commands=['start'])
@@ -29,7 +29,7 @@ def message_reply(message: Message):
     elif message.text == locale.read('register'):
         init_registration(message, bot)
     elif message.text == locale.read('status'):
-        check_status(message, bot)
+        check_status(message.chat.id, message.from_user.id, bot)
     elif message.text == locale.read('request_pay_proof'):
         block_interface(message, bot)
 

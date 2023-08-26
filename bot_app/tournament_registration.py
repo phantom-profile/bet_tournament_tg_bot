@@ -1,8 +1,7 @@
-from dataclasses import dataclass
 from pathlib import Path
 
 import telebot
-from telebot.types import Message, ReplyKeyboardMarkup
+from telebot.types import Message
 
 from bot_app.ui_components import participant_keyboard, init_payment_keyboard, start_keyboard
 from config import locale
