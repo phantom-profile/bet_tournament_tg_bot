@@ -22,3 +22,5 @@ if env_variables.get('SENTRY_TOKEN'):
         # percentage of sent to Sentry errors
         traces_sample_rate=1.0,
     )
+else:
+    print('WARN: NO SENTRY CONFIG PRESENTS!!!')

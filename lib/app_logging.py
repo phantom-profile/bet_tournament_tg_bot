@@ -21,14 +21,11 @@ def logger_factory():
 
 
 def log(message: Message):
+    # TODO: Change to another log system (file logs mb)
     print("INFO:", datetime.now())
-    print(
-        f"Сообщение от {message.from_user.first_name} {message.from_user.last_name}"
-        f" (id = {message.from_user.id}) \n {message.text}"
-    )
+    print(f"Message from {message.from_user.first_name} {message.from_user.last_name}")
+    print(f"(id = {message.from_user.id}) \n {message.text}")
     if message.document:
-        print(
-            f"Загрузка файла {message.document.file_name}. "
-            f"Размер: {message.document.file_size}"
-        )
+        print(f"File uploading {message.document.file_name}. ")
+        print(f"File size: {message.document.file_size}")
 
