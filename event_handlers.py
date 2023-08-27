@@ -6,12 +6,14 @@ from bot_app.tournament_registration import init_registration, block_interface, 
 from bot_app.user import User
 
 from config import env_variables, locale
-
+from lib.app_logging import logger_factory, log
 
 bot = TeleBot(env_variables.get('TG_BOT_TOKEN'), parse_mode=None)
+logger = logger_factory()
 
 
 @bot.message_handler(commands=['start'])
+@logger
 def send_welcome(message: Message):
     user = User(message.from_user.id)
     if user.is_temp_blocked:
@@ -21,8 +23,9 @@ def send_welcome(message: Message):
 
 
 @bot.message_handler(content_types=['text'])
+@logger
 def message_reply(message: Message):
-    print(message.text)
+    log(message)
     user = User(message.from_user.id)
     if user.is_temp_blocked:
         return bot.send_message(user.id, locale.read('pay_proof_message'))
@@ -38,7 +41,9 @@ def message_reply(message: Message):
 
 
 @bot.message_handler(content_types=['document'])
+@logger
 def get_payment_proof(message: Message):
+    log(message)
     get_payment_from_user(message, bot)
 
 
