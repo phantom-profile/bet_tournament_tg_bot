@@ -17,7 +17,7 @@ def send_welcome(message: Message):
     if user.is_temp_blocked:
         return bot.send_message(user.id, locale.read('pay_proof_message'))
 
-    initial_info(message.chat.id, bot)
+    initial_info(user.id, bot)
 
 
 @bot.message_handler(content_types=['text'])
