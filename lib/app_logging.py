@@ -1,8 +1,11 @@
-from datetime import datetime
+import logging
 from functools import wraps
 
 import sentry_sdk
 from telebot.types import Message
+
+
+EXCLUDED_EXCEPTIONS = (KeyboardInterrupt,)
 
 
 def logger_factory():
@@ -12,20 +15,32 @@ def logger_factory():
             try:
                 return f(*args, **kwargs)
             except Exception as e:
-                if not isinstance(e, KeyboardInterrupt):
+                if not isinstance(e, EXCLUDED_EXCEPTIONS):
                     sentry_sdk.capture_exception(e)
+                    log_error(e)
                 raise e
 
         return inner
     return debug_request
 
 
-def log(message: Message):
-    # TODO: Change to another log system (file logs mb)
-    print("INFO:", datetime.now())
-    print(f"Message from {message.from_user.first_name} {message.from_user.last_name}")
-    print(f"(id = {message.from_user.id}) \n {message.text}")
-    if message.document:
-        print(f"File uploading {message.document.file_name}. ")
-        print(f"File size: {message.document.file_size}")
+def log_tg_message(message: Message):
+    log_message = "\n<----------------->\n" \
+        f"message_sender: {message.from_user.first_name} {message.from_user.last_name} \n" \
+        f"sender_id: {message.from_user.id} \n" \
+        f"message_text: {message.text}\n"
 
+    if message.document:
+        log_message += f"file_name: {message.document.file_name}. \n" \
+                       f"file_size: {message.document.file_size / 1024}\n"
+
+    log_message += "<================>\n"
+    logging.info(log_message)
+
+
+def log_text(text: str, level=logging.WARNING):
+    logging.log(level, text)
+
+
+def log_error(error: Exception):
+    logging.error(f"{error.__class__}", exc_info=True)
