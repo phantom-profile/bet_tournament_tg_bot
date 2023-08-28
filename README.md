@@ -9,7 +9,7 @@ cp .env.example .env
 ```
 
 ### Launch project
-1) launch tgbot `python3 event_hadlers.py`
+1) launch tgbot `python3 event_handlers.py`
 2) launch flask server `flask --app main run --reload`
 
 ### Public api endpoints
