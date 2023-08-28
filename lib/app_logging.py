@@ -32,7 +32,7 @@ def log_tg_message(message: Message):
 
     if message.document:
         log_message += f"file_name: {message.document.file_name}. \n" \
-                       f"file_size: {message.document.file_size / 1024}\n"
+                       f"file_size: {message.document.file_size / 1024} KB\n"
 
     log_message += "<================>\n"
     logging.info(log_message)
