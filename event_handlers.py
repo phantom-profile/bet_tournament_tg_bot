@@ -5,7 +5,7 @@ from bot_app.info_providing import initial_info, check_status, rules_info
 from bot_app.tournament_registration import init_registration, block_interface, get_payment_from_user
 from bot_app.user import User
 
-from config import env_variables, locale
+from config.setup import env_variables, locale
 from lib.app_logging import logger_factory, log_tg_message
 
 bot = TeleBot(env_variables.get('TG_BOT_TOKEN'), parse_mode=None)

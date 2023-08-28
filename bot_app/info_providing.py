@@ -2,11 +2,10 @@ from telebot import TeleBot
 
 from bot_app.ui_components import participant_keyboard, start_keyboard
 from bot_app.user import User
-from config import locale
+from config.setup import locale
 
 
 def check_status(user: User, bot: TeleBot):
-    print('user id', user.id)
     if user.is_participant:
         return bot.send_message(
             user.id,

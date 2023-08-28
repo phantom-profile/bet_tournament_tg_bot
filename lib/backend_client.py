@@ -1,4 +1,4 @@
-from config import env_variables
+from config.setup import env_variables
 from lib.base_client import BaseClient, Red
 
 

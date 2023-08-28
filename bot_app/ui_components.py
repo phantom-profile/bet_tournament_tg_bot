@@ -1,6 +1,6 @@
 from telebot import types
 
-from config import locale
+from config.setup import locale
 
 
 def init_payment_keyboard():

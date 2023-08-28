@@ -5,7 +5,7 @@ from telebot.types import Message
 
 from bot_app.ui_components import participant_keyboard, init_payment_keyboard, start_keyboard
 from bot_app.user import User
-from config import locale
+from config.setup import locale
 from lib.backend_client import BackendClient, Red
 
 
