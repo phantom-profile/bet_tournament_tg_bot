@@ -10,6 +10,13 @@ def init_payment_keyboard():
     return keyboard
 
 
+def request_membership_keyboard():
+    keyboard = types.ReplyKeyboardMarkup(row_width=1)
+    payment = types.InlineKeyboardButton(text=locale.read('request_membership'))
+    keyboard.add(payment)
+    return keyboard
+
+
 def start_keyboard():
     keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
     rules = types.KeyboardButton(text=locale.read('rules'))

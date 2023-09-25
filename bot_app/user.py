@@ -1,22 +1,22 @@
-from lib.backend_client import BackendClient
+from telebot import types
+
 from lib.base_client import Red
 
 
 class User:
-    def __init__(self, user_id: int):
-        self.id = user_id
-        self.client = BackendClient()
+    def __init__(self, tg_user: types.User):
+        self.id = tg_user.id
+        self.nick = tg_user.username
 
     @property
-    def is_temp_blocked(self) -> bool:
+    def is_on_hold(self) -> bool:
         return Red.exists(self._lock_key)
 
     def block(self):
         Red.set(self._lock_key, "true")
 
-    @property
-    def is_participant(self) -> bool:
-        return self.client.in_current_tournament(self.id)
+    def activate(self):
+        Red.delete(self._lock_key)
 
     @property
     def _lock_key(self):
