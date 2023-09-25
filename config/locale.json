@@ -15,7 +15,8 @@
     "proof_sent": "Файл квитанции загружен, админ проверит его и, если все круто, допустит вас до участия в турнире. Вам придет сообщение в этот чат :)",
     "no_file_need": "Отправка файла сейчас не требуется",
     "file_size_limit": "Файл квитанции должен быть менее 1 MB",
-    "no_file_exists": "Файл отсутсвует"
+    "no_file_exists": "Файл отсутсвует",
+    "request_membership": "Я ознакомился с инструкцией, правилами и согласен участвовать"
   },
   "en": {
     "start":  "Hello, it is a bot for bet tournaments \nTo participate ypu need to register to tournament. \nClick register button and follow instructions\uD83D\uDE0E"

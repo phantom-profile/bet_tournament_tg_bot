@@ -4,6 +4,8 @@ from typing import Optional
 from requests import Response, exceptions
 from redis import Redis
 
+from lib.app_logging import log_text
+
 
 # Redis documentation - https://redis.io/docs/clients/python/
 Red = Redis(host='localhost', port=6379, decode_responses=True)
@@ -51,6 +53,12 @@ class BaseClient:
     # FOR INTERNAL USAGE ONLY
     @property
     def _service_response(self):
+        if not self._is_successful:
+            log_text(
+                f"REQUES_FAILED: {self._parsed_response}",
+                extra={'status': self._response.status_code}
+            )
+
         return {
             'status': self._response.status_code,
             'requested_url': self._response.url,

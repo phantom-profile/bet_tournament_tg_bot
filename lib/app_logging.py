@@ -38,7 +38,9 @@ def log_tg_message(message: Message):
     logging.info(log_message)
 
 
-def log_text(text: str, level=logging.WARNING):
+def log_text(text: str, level=logging.WARNING, sentry=True, extra: dict = None):
+    if sentry:
+        sentry_sdk.capture_message(text, extra=extra or {})
     logging.log(level, text)
 
 
