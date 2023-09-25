@@ -16,7 +16,8 @@
     "no_file_need": "Отправка файла сейчас не требуется",
     "file_size_limit": "Файл квитанции должен быть менее 1 MB",
     "no_file_exists": "Файл отсутсвует",
-    "request_membership": "Я ознакомился с инструкцией, правилами и согласен участвовать"
+    "request_membership": "Я ознакомился с инструкцией, правилами и согласен участвовать",
+    "tournament_is_full": "Сейчас нет свободных мест в турнире :("
   },
   "en": {
     "start":  "Hello, it is a bot for bet tournaments \nTo participate ypu need to register to tournament. \nClick register button and follow instructions\uD83D\uDE0E"

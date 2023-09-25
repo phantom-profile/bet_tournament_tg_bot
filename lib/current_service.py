@@ -15,7 +15,7 @@ class Tournament:
     duration: int
     created_at: datetime
     starts_at: datetime
-    members_ids: list[str]
+    members_ids: set[str]
 
     @classmethod
     def from_dict(self, params: dict):
@@ -28,14 +28,14 @@ class Tournament:
             duration=params['duration'],
             created_at=datetime.fromisoformat(params['created_at']),
             starts_at=datetime.fromisoformat(params['starts_at']),
-            members_ids=params['members_ids']
+            members_ids=set(params['members_ids'])
         )
 
     def is_member(self, user_id) -> bool:
         return str(user_id) in self.members_ids
 
-    def able_to_register(self, user_id) -> bool:
-        return not self.is_member(user_id) and self.members_count < self.members_limit
+    def is_full(self) -> bool:
+        return self.members_count >= self.members_limit
 
 
 class CurrentTournamentsService:

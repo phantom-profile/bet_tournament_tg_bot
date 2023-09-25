@@ -75,6 +75,9 @@ class RegisterOnTournamentService:
         if self.tournament.is_member(self.user.id):
             return locale.read('already_participate'), participant_keyboard()
 
+        if self.tournament.is_full():
+            return locale.read('tournament_is_full'), start_keyboard()
+
         return locale.read('register_instruction'), request_membership_keyboard()
 
     def _register_error(self):
