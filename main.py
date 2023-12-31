@@ -21,23 +21,23 @@ class SendMessagesService:
 
     def __post_init__(self):
         if not isinstance(self.chat_ids, list):
-            self.errors.append("chat_ids param required as list of ids")
+            self.errors.append('chat_ids param required as list of ids')
         if not isinstance(self.message, str):
-            self.errors.append("message param required as formatted string")
+            self.errors.append('message param required as formatted string')
         if self.token != env_variables.get('API_ACCESS_TOKEN'):
-            self.errors.append("Invalid access token")
+            self.errors.append('Invalid access token')
 
     def call(self):
         if self.errors:
-            self.response, self.status = {"errors": self.errors}, 400
+            self.response, self.status = {'errors': self.errors}, 400
             return
         for chat_id in self.chat_ids:
-            bot.send_message(chat_id, f"{self.message}")
+            bot.send_message(chat_id, f'{self.message}')
             sleep(0.2)
-        self.response, self.status = {"chat_ids": self.chat_ids, "message": self.message}, 200
+        self.response, self.status = {'chat_ids': self.chat_ids, 'message': self.message}, 200
 
 
-@app.route("/tgsend", methods=['POST'])
+@app.route('/tgsend', methods=['POST'])
 def send_message():
     service = SendMessagesService(
         chat_ids=request.json.get('chat_ids'),
