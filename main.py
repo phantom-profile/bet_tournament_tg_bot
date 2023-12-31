@@ -29,14 +29,12 @@ class SendMessagesService:
 
     def call(self):
         if self.errors:
-            self.response = {"errors": self.errors}
-            self.status = 400
+            self.response, self.status = {"errors": self.errors}, 400
             return
         for chat_id in self.chat_ids:
             bot.send_message(chat_id, f"{self.message}")
-            sleep(0.3)
-        self.response = {"chat_ids": self.chat_ids, "message": self.message}
-        self.status = 200
+            sleep(0.2)
+        self.response, self.status = {"chat_ids": self.chat_ids, "message": self.message}, 200
 
 
 @app.route("/tgsend", methods=['POST'])
