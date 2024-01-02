@@ -12,6 +12,10 @@ class User:
     def is_on_hold(self) -> bool:
         return Red.exists(self._lock_key)
 
+    @property
+    def is_active(self) -> bool:
+        return not self.is_on_hold
+
     def block(self):
         Red.set(self._lock_key, "true")
 
