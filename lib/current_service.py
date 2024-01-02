@@ -46,14 +46,13 @@ class CurrentTournamentsService:
 
     def call(self) -> dict[str, Tournament | None]:
         response = self.client.get_current_tournaments()
-        if not response['is_successful']:
-            return self._response(None, response['response_body'])
+        if not response.is_successful:
+            return self._response(None, response.body)
 
-        body = response['response_body']
-        if not body['open_tournament_exists']:
+        if not response.body['open_tournament_exists']:
             return self._response(None, None)
 
-        return self._response(self._build_tournament(body), None)
+        return self._response(self._build_tournament(response.body), None)
 
     def _response(self, tournament, errors):
         return {'tournament': tournament, 'errors': errors}

@@ -37,7 +37,7 @@ class RegisterOnTournamentService:
             user_name=self.user.nick,
             current=self.tournament.id
         )
-        if not response['is_successful']:
+        if not response.is_successful:
             self.user.activate()
             return self.bot.send_message(chat_id=self.message.chat.id, text=lc("default error"))
 
@@ -57,7 +57,7 @@ class RegisterOnTournamentService:
         file_info = self.bot.get_file(self.message.document.file_id)
         content = self.bot.download_file(file_info.file_path)
         response = self.client.upload_file(self.tournament.id, self.user.id, content)
-        if response['is_successful']:
+        if response.is_successful:
             self.user.activate()
             self.bot.send_message(
                 chat_id=self.message.chat.id,

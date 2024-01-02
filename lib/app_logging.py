@@ -25,7 +25,7 @@ def logger_factory():
 
 def log_tg_message(message: Message):
     log_message = "\n<----------------->\n" \
-        f"message_sender: {message.from_user.first_name} {message.from_user.last_name} \n" \
+        f"message_sender: {message.from_user.full_name}\n" \
         f"sender_id: {message.from_user.id} \n" \
         f"message_text: {message.text}\n"
 

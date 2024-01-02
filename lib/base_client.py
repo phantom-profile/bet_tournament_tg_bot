@@ -1,8 +1,10 @@
+from dataclasses import dataclass
 from json import dumps, loads
-from typing import Optional
+from typing import Any, Optional
 
 from redis import Redis
-from requests import Response, exceptions
+from requests import Response as HttpResponse
+from requests import exceptions
 
 from lib.app_logging import log_text
 
@@ -38,6 +40,14 @@ class CacheService:
         Red.set(self.key, dumps(jsonable))
 
 
+@dataclass
+class Response:
+    status: int
+    request_url: str
+    is_successful: bool
+    body: dict[str, Any]
+
+
 class BaseClient:
     URL = ''
     TOKEN = ''
@@ -46,24 +56,24 @@ class BaseClient:
         if not self.TOKEN:
             raise AttributeError('API token is empty! Add it to .env config')
 
-        self._response: Optional[Response] = None
+        self._response: Optional[HttpResponse] = None
         self.cacher = CacheService()
 
     # FOR INTERNAL USAGE ONLY
     @property
-    def _service_response(self):
+    def _service_response(self) -> Response:
         if not self._is_successful:
             log_text(
                 f"REQUES_FAILED: {self._parsed_response}",
                 extra={'status': self._response.status_code}
             )
 
-        return {
-            'status': self._response.status_code,
-            'requested_url': self._response.url,
-            'is_successful': self._is_successful,
-            'response_body': self._parsed_response
-        }
+        return Response(
+            status=self._response.status_code,
+            request_url=self._response.url,
+            is_successful=self._is_successful,
+            body=self._parsed_response
+        )
 
     def _build_url(self, path: str, request_format: str = None):
         if not request_format:
