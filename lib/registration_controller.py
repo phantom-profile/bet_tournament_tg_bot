@@ -19,7 +19,7 @@ class ServiceResult:
     keyboard: ReplyKeyboardMarkup | None = None
 
 
-class RegistrationService:
+class RegistrationController:
     def __init__(self, user: User, message: Message, bot: TeleBot):
         self.client = BackendClient()
         self.user = user

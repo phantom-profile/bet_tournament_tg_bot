@@ -6,7 +6,7 @@ from bot_app.ui_components import start_keyboard
 from bot_app.user import User
 from config.setup import env_variables, lc
 from lib.app_logging import log_tg_message, logger_factory
-from lib.registration_service import RegistrationService
+from lib.registration_controller import RegistrationController
 from lib.status_service import CheckStatusService
 
 bot = TeleBot(env_variables.get('TG_BOT_TOKEN'), parse_mode=None)
@@ -38,9 +38,9 @@ def message_reply(message: Message):
     elif message.text == lc('status button'):
         CheckStatusService(user, message, bot).call()
     elif message.text == lc('registration button'):
-        RegistrationService(user, message, bot).get_instructions()
+        RegistrationController(user, message, bot).get_instructions()
     elif message.text == lc('request membership button'):
-        RegistrationService(user, message, bot).block_unlit_pay()
+        RegistrationController(user, message, bot).block_unlit_pay()
 
 
 @bot.message_handler(content_types=['document'])
@@ -48,7 +48,7 @@ def message_reply(message: Message):
 def get_payment_proof(message: Message):
     log_tg_message(message)
     user = User(message.from_user)
-    RegistrationService(user, message, bot).pay()
+    RegistrationController(user, message, bot).pay()
 
 
 if __name__ == '__main__':
