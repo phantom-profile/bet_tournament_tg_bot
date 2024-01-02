@@ -44,8 +44,7 @@ class RegisterOnTournamentService:
         if register_error:
             return self.ui.send(message=register_error)
 
-        file_info = self.bot.get_file(self.message.document.file_id)
-        content = self.bot.download_file(file_info.file_path)
+        content = get_file_content(self.bot, self.message.document.file_id)
         response = self.client.upload_file(self.tournament.id, self.user.id, content)
         if response.is_successful:
             self.user.activate()
@@ -81,3 +80,8 @@ class RegisterOnTournamentService:
             self._tournament = CurrentTournamentsService().call()
 
         return self._tournament
+
+
+def get_file_content(bot: TeleBot, file_id: str):
+    file_info = bot.get_file(file_id)
+    return bot.download_file(file_info.file_path)
