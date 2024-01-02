@@ -4,7 +4,7 @@ from telebot.types import Message
 from bot_app.ui_components import start_keyboard, participant_keyboard, init_payment_keyboard, \
     request_membership_keyboard
 from bot_app.user import User
-from config.setup import locale
+from config.setup import l
 from lib.current_service import CurrentTournamentsService
 from lib.backend_client import BackendClient
 
@@ -39,13 +39,12 @@ class RegisterOnTournamentService:
             current=self.tournament.id
         )
         if not response['is_successful']:
-            message = 'Регистрация на турнир не возможна в данный момент. Попробуйте позже'
             self.user.activate()
-            return self.bot.send_message(chat_id=self.message.chat.id, text=message)
+            return self.bot.send_message(chat_id=self.message.chat.id, text=l("default error"))
 
         self.bot.send_message(
             chat_id=self.message.chat.id,
-            text=locale.read('pay_proof_message')
+            text=l('payment request message')
         )
 
     def pay(self):
@@ -61,34 +60,31 @@ class RegisterOnTournamentService:
         response = self.client.upload_file(self.tournament.id, self.user.id, content)
         if response['is_successful']:
             self.user.activate()
-            self.bot.send_message(self.message.chat.id, locale.read('proof_sent'), reply_markup=participant_keyboard())
+            self.bot.send_message(self.message.chat.id, l('payment file sent'), reply_markup=participant_keyboard())
         else:
-            return self.bot.send_message(
-                chat_id=self.message.chat.id,
-                text='Загрузка файла не удалась, попробуйте позже или обратитесь в поддержку'
-            )
+            return self.bot.send_message(chat_id=self.message.chat.id, text=l("default error"))
 
     def _init_reply_data(self) -> tuple:
         if not self.tournament:
-            return locale.read('registration_closed'), start_keyboard()
+            return l('registration closed error'), start_keyboard()
 
         if self.tournament.is_member(self.user.id):
-            return locale.read('already_participate'), participant_keyboard()
+            return l('member status'), participant_keyboard()
 
         if self.tournament.is_full():
-            return locale.read('tournament_is_full'), start_keyboard()
+            return l('tournament is full error'), start_keyboard()
 
-        return locale.read('register_instruction'), request_membership_keyboard()
+        return l('register instruction'), request_membership_keyboard()
 
     def _register_error(self):
         if not self.user.is_on_hold:
-            return locale.read('no_file_need')
+            return l('no file need error')
 
         if not self.message.document:
-            return locale.read('no_file_exists')
+            return l('no file exists error')
 
         if self.message.document.file_size > MB:
-            return locale.read('file_size_limit')
+            return l('file size limit error')
 
     @property
     def tournament(self):
