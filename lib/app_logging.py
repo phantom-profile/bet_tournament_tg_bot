@@ -4,7 +4,6 @@ from functools import wraps
 import sentry_sdk
 from telebot.types import Message
 
-
 EXCLUDED_EXCEPTIONS = (KeyboardInterrupt,)
 
 

@@ -3,9 +3,8 @@ from telebot.types import Message
 
 from bot_app.info_providing import initial_info, rules_info
 from bot_app.user import User
-
-from config.setup import env_variables, locale
-from lib.app_logging import logger_factory, log_tg_message
+from config.setup import env_variables, lc
+from lib.app_logging import log_tg_message, logger_factory
 from lib.registration_service import RegisterOnTournamentService
 from lib.status_service import CheckStatusService
 
@@ -18,7 +17,7 @@ logger = logger_factory()
 def send_welcome(message: Message):
     user = User(message.from_user)
     if user.is_on_hold:
-        return bot.send_message(user.id, locale.read('pay_proof_message'))
+        return bot.send_message(user.id, lc('payment request message'))
 
     initial_info(user.id, bot)
 
@@ -29,15 +28,15 @@ def message_reply(message: Message):
     log_tg_message(message)
     user = User(message.from_user)
     if user.is_on_hold:
-        return bot.send_message(user.id, locale.read('pay_proof_message'))
+        return bot.send_message(user.id, lc('payment request message'))
 
-    if message.text == locale.read('rules'):
+    if message.text == lc('rules button'):
         rules_info(user.id, bot)
-    elif message.text == locale.read('status'):
+    elif message.text == lc('status button'):
         CheckStatusService(user, message, bot).call()
-    elif message.text == locale.read('register'):
+    elif message.text == lc('registration button'):
         RegisterOnTournamentService(user, message, bot).get_instructions()
-    elif message.text == locale.read('request_membership'):
+    elif message.text == lc('request membership button'):
         RegisterOnTournamentService(user, message, bot).hold_unlit_payment()
 
 

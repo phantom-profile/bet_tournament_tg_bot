@@ -3,9 +3,8 @@ from time import sleep
 
 from flask import Flask, request
 
-from event_handlers import bot
 from config.setup import env_variables
-
+from event_handlers import bot
 
 app = Flask(__name__)
 

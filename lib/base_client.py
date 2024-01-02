@@ -1,11 +1,10 @@
-from json import loads, dumps
+from json import dumps, loads
 from typing import Optional
 
-from requests import Response, exceptions
 from redis import Redis
+from requests import Response, exceptions
 
 from lib.app_logging import log_text
-
 
 # Redis documentation - https://redis.io/docs/clients/python/
 Red = Redis(host='localhost', port=6379, decode_responses=True)
