@@ -6,3 +6,4 @@ requests
 redis
 ipython
 sentry-sdk
+isort

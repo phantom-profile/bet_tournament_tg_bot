@@ -1,14 +1,12 @@
 import gettext
 import logging
-from pathlib import Path
 from json import load
+from pathlib import Path
 from typing import Callable
 
-from dotenv import dotenv_values
-
 import sentry_sdk
+from dotenv import dotenv_values
 from sentry_sdk.integrations.logging import ignore_logger
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -69,7 +67,7 @@ def set_logger():
 
 set_logger()
 logging.info('locale file initialize')
-l = set_locale()
+lc = set_locale()
 if env_variables.get('SENTRY_TOKEN'):
     logging.info('sentry initialize')
 
