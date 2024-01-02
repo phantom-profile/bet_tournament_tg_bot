@@ -1,12 +1,13 @@
+import gettext
 import logging
 from pathlib import Path
 from json import load
+from typing import Callable
+
 from dotenv import dotenv_values
 
 import sentry_sdk
 from sentry_sdk.integrations.logging import ignore_logger
-
-from lib.locale_service import LocaleService
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -16,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 class Config:
     CONF_FILE = BASE_DIR / 'config' / 'config.json'
     ENV_FILE = BASE_DIR / 'config' / '.env'
-    LOCALE_FILE = BASE_DIR / 'config' / 'locale.json'
+    LOCALE_DIR = BASE_DIR / 'locales'
 
     def __init__(self):
         self._config = self._load_data()
@@ -50,8 +51,13 @@ class Config:
 
 
 app_conf = Config()
-locale = LocaleService(app_conf.LOCALE_FILE, app_conf.locale)
 env_variables = dotenv_values(app_conf.ENV_FILE)
+
+
+def set_locale() -> Callable[[str], str]:
+    locale = gettext.translation('app', localedir=Config.LOCALE_DIR, languages=[app_conf.locale])
+    locale.install()
+    return locale.gettext
 
 
 def set_logger():
@@ -62,6 +68,8 @@ def set_logger():
 
 
 set_logger()
+logging.info('locale file initialize')
+l = set_locale()
 if env_variables.get('SENTRY_TOKEN'):
     logging.info('sentry initialize')
 
