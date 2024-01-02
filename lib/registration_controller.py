@@ -111,7 +111,7 @@ class SavePaymentService:
             return ServiceResult('default error')
 
     def _register_error(self):
-        if not self.user.is_on_hold:
+        if self.user.is_active:
             return 'no file need error'
 
         if not self.file:

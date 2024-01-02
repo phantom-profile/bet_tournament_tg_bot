@@ -9,7 +9,7 @@ cp .env.example .env
 ```
 
 ### Launch project
-1) generate locale `cd locales/ru/LC_MESSAGES && msgfmt app.po -o app.mo`
+1) generate locale `cd locales/ru/LC_MESSAGES; msgfmt app.po -o app.mo; cd ../../..`
 2) launch tgbot `python3 event_handlers.py`
 3) launch flask server `flask --app main run --reload`
 

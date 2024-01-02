@@ -8,12 +8,15 @@ from config.setup import env_variables, lc
 from lib.app_logging import log_tg_message, logger_factory
 from lib.registration_controller import RegistrationController
 from lib.status_service import CheckStatusService
+from lib.spam_protection import control_rate_limit
 
 bot = TeleBot(env_variables.get('TG_BOT_TOKEN'), parse_mode=None)
 logger = logger_factory()
+protector = control_rate_limit(bot)
 
 
 @bot.message_handler(commands=['start'])
+@protector
 @logger
 def send_welcome(message: Message):
     user = User(message.from_user)
@@ -25,6 +28,7 @@ def send_welcome(message: Message):
 
 
 @bot.message_handler(content_types=['text'])
+@protector
 @logger
 def message_reply(message: Message):
     log_tg_message(message)
@@ -44,6 +48,7 @@ def message_reply(message: Message):
 
 
 @bot.message_handler(content_types=['document'])
+@protector
 @logger
 def get_payment_proof(message: Message):
     log_tg_message(message)
