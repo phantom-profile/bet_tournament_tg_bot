@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from json import dumps, loads
 from typing import Any, Optional
@@ -62,18 +63,15 @@ class BaseClient:
     # FOR INTERNAL USAGE ONLY
     @property
     def _service_response(self) -> Response:
-        if not self._is_successful:
-            log_text(
-                f"REQUES_FAILED: {self._parsed_response}",
-                extra={'status': self._response.status_code}
-            )
-
-        return Response(
+        response = Response(
             status=self._response.status_code,
             request_url=self._response.url,
             is_successful=self._is_successful,
             body=self._parsed_response
         )
+        params = {'level': logging.INFO, 'sentry': False} if response.is_successful else {}
+        log_text(str(response), **params)
+        return response
 
     def _build_url(self, path: str, request_format: str = None):
         if not request_format:
