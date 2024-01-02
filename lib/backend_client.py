@@ -10,7 +10,7 @@ class BackendClient(BaseClient):
 
     def check_status(self, user_id: int, current: int) -> bool:
         self._response = requests.get(
-            url=self._build_url(f"api/tournaments/{current}/members/{user_id}/check"),
+            url=self._build_url(f"api/private/tournaments/{current}/members/{user_id}/check"),
             params={"token": self.TOKEN}
         )
 
@@ -18,7 +18,7 @@ class BackendClient(BaseClient):
 
     def register(self, user_id: int, user_name: str, current: int):
         self._response = requests.post(
-            url=self._build_url(f"api/tournaments/{current}/members/"),
+            url=self._build_url(f"api/private/tournaments/{current}/members/"),
             json={"tg_id": user_id, "tg_nickname": user_name},
             params={"token": self.TOKEN}
         )
@@ -27,7 +27,7 @@ class BackendClient(BaseClient):
 
     def get_current_tournaments(self):
         self._response = requests.get(
-            url=self._build_url('api/tournaments/current'),
+            url=self._build_url('api/private/tournaments/current'),
             params={"token": self.TOKEN}
         )
 
@@ -35,7 +35,7 @@ class BackendClient(BaseClient):
 
     def upload_file(self, tournament_id, user_id, file: bytes):
         self._response = requests.put(
-            url=self._build_url(f'api/tournaments/{tournament_id}/members/{user_id}/upload_payment/'),
+            url=self._build_url(f'api/private/tournaments/{tournament_id}/members/{user_id}/prove_payment/'),
             params={"token": self.TOKEN},
             files={"payment_file": file}
         )
