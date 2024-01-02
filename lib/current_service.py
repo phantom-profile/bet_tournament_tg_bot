@@ -2,7 +2,6 @@ import dataclasses
 from datetime import datetime
 
 from lib.backend_client import BackendClient
-from lib.base_client import CacheService
 
 
 @dataclasses.dataclass
@@ -41,21 +40,13 @@ class Tournament:
 class CurrentTournamentsService:
     def __init__(self):
         self.client = BackendClient()
-        self.cacher = CacheService()
-        self.cacher.set_key('current-active-tournament')
 
-    def call(self) -> dict[str, Tournament | None]:
+    def call(self) -> Tournament | None:
         response = self.client.get_current_tournaments()
-        if not response.is_successful:
-            return self._response(None, response.body)
-
         if not response.body['open_tournament_exists']:
-            return self._response(None, None)
+            return None
 
-        return self._response(self._build_tournament(response.body), None)
-
-    def _response(self, tournament, errors):
-        return {'tournament': tournament, 'errors': errors}
+        return self._build_tournament(response.body)
 
     def _build_tournament(self, response):
         tournament_params = response['tournaments'][0]
