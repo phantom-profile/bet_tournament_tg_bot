@@ -3,8 +3,8 @@ from functools import wraps
 from telebot import TeleBot
 from telebot.types import Message
 
-from lib.base_client import Red
 from bot_app.message_sender import MessageSender
+from lib.base_client import Red
 
 
 class SpamProtector:

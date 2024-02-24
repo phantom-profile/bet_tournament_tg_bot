@@ -7,8 +7,8 @@ from bot_app.user import User
 from config.setup import env_variables, lc
 from lib.app_logging import log_tg_message, logger_factory
 from lib.registration_controller import RegistrationController
-from lib.status_service import CheckStatusService
 from lib.spam_protection import control_rate_limit
+from lib.status_service import CheckStatusService
 
 bot = TeleBot(env_variables.get('TG_BOT_TOKEN'), parse_mode=None)
 logger = logger_factory()
