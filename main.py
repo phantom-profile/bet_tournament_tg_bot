@@ -19,12 +19,13 @@ class SendMessagesService:
     status: int = None
 
     def __post_init__(self):
+        if self.token != env_variables.get('API_ACCESS_TOKEN'):
+            self.errors.append('Invalid access token')
+            return
         if not isinstance(self.chat_ids, list):
             self.errors.append('chat_ids param required as list of ids')
         if not isinstance(self.message, str):
             self.errors.append('message param required as formatted string')
-        if self.token != env_variables.get('API_ACCESS_TOKEN'):
-            self.errors.append('Invalid access token')
 
     def call(self):
         if self.errors:
