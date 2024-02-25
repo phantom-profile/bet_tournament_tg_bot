@@ -40,7 +40,7 @@ def message_reply(message: Message):
     if message.text == lc('rules button'):
         ui.send(message='membership rules')
     elif message.text == lc('status button'):
-        CheckStatusService(user, message, bot).call()
+        CheckStatusService(user, ui).call()
     elif message.text == lc('registration button'):
         RegistrationController(user, message, bot).get_instructions()
     elif message.text == lc('request membership button'):
