@@ -1,6 +1,3 @@
-from telebot import TeleBot
-from telebot.types import Message
-
 from bot_app.message_sender import MessageSender
 from bot_app.ui_components import participant_keyboard, start_keyboard
 from bot_app.user import User
@@ -8,9 +5,9 @@ from lib.current_service import CurrentTournamentsService
 
 
 class CheckStatusService:
-    def __init__(self, user: User, message: Message, bot: TeleBot):
+    def __init__(self, user: User, ui: MessageSender):
         self.user = user
-        self.ui = MessageSender(bot, message.chat.id)
+        self.ui = ui
 
     def call(self):
         tournament = CurrentTournamentsService().call()

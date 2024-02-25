@@ -27,7 +27,7 @@ class CacheService:
         self.__key = key
 
     def is_exist(self):
-        return Red.exists(self.key)
+        return Red.exists(self.key) > 0
 
     def get_cached(self):
         if not self.is_exist():
