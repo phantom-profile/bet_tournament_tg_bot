@@ -1,16 +1,21 @@
 import fakeredis
 import pytest
+import redis
 from pytest_mock import MockerFixture
 
+import lib.base_client
 from bot_app.message_sender import MessageSender
 from lib.backend_client import BackendClient
+from lib import base_client
+
 from tests.helpers import TgTestBot
 
 
 @pytest.fixture(autouse=True)
 def patch_redis_global(monkeypatch):
     # Patch the 'Red' global variable with the fake Redis client
-    monkeypatch.setattr('lib.base_client.Red', fakeredis.FakeRedis())
+    monkeypatch.setattr(base_client.Red, 'conn', fakeredis.FakeRedis())
+
 
 
 @pytest.fixture

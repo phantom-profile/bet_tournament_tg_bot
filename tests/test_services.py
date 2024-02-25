@@ -1,4 +1,6 @@
 from lib.current_service import CurrentTournamentsService
+from lib.spam_protection import SpamProtector
+
 from tests.factories import ResponceFactory
 from tests.helpers import tournament_payload
 
@@ -33,3 +35,11 @@ def test_get_current_tournament_if_does_not_exist(backend_client):
     backend_client.get_current_tournaments.return_value = response
     result = CurrentTournamentsService().call()
     assert result is None
+
+
+def test_spam_protection_service_allow_warn_and_block():
+    user_id = 123
+    for i in range(SpamProtector.LIMIT - 1):
+        assert SpamProtector(user_id).decision() == SpamProtector.ALLOW
+    assert SpamProtector(user_id).decision() == SpamProtector.WARN
+    assert SpamProtector(user_id).decision() == SpamProtector.FORBID
