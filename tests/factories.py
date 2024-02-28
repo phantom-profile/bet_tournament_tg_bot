@@ -1,8 +1,8 @@
 import factory
 import faker
 
-from lib.base_client import Response
 from bot_app.user import User
+from lib.base_client import Response
 
 generator = faker.Faker(use_weighting=False)
 

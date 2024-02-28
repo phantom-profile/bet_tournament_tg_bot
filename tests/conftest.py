@@ -5,11 +5,10 @@ import pytest
 from pytest_mock import MockerFixture
 
 from bot_app.message_sender import MessageSender
-from lib.backend_client import BackendClient
-from lib import base_client
-
 from config.setup import BASE_DIR
-from tests.factories import ResponceFactory, UserFactory
+from lib import base_client
+from lib.backend_client import BackendClient
+from tests.factories import ResponceFactory
 
 
 @pytest.fixture(autouse=True)

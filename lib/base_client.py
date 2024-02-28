@@ -1,10 +1,9 @@
 import logging
-import redis
-
 from dataclasses import dataclass
 from json import dumps, loads
 from typing import Any, Optional
 
+import redis
 from requests import Response as HttpResponse
 from requests import exceptions
 

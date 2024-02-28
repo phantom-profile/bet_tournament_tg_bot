@@ -1,8 +1,7 @@
 from bot_app.ui_components import Keyboards
 from lib.current_service import CurrentTournamentsService
-from lib.status_service import CheckStatusService
 from lib.spam_protection import SpamProtector
-
+from lib.status_service import CheckStatusService
 from tests.factories import ResponceFactory, UserFactory
 
 

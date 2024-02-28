@@ -5,7 +5,6 @@ from telebot.types import Message, ReplyKeyboardMarkup
 
 from bot_app.message_sender import MessageSender
 from bot_app.ui_components import Keyboards
-
 from bot_app.user import User
 from lib.backend_client import BackendClient
 from lib.current_service import CurrentTournamentsService, Tournament
