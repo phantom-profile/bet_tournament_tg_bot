@@ -68,7 +68,7 @@ def set_logger():
 set_logger()
 logging.info('locale file initialize')
 lc = set_locale()
-if env_variables.get('SENTRY_TOKEN'):
+if env_variables.get('SENTRY_TOKEN') and app_conf.is_production:
     logging.info('sentry initialize')
 
     ignore_logger("TeleBot")
