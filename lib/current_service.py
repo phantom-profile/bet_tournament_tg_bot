@@ -53,5 +53,5 @@ class CurrentTournamentsService:
         ids = []
         for member in tournament_params['members']:
             if member['status'] != 'declined':
-                ids.append(member['tg_id'])
+                ids.append(str(member['tg_id']))
         return Tournament.from_dict(tournament_params | {'members_ids': ids})

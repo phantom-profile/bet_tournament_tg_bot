@@ -1,0 +1,50 @@
+name: Bet tournament bot application
+run-name: ${{ github.actor }} is using GitHub Actions 🚀
+
+on:
+  push:
+
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.12"
+    - name: Install dependencies
+      run: |
+        pip install flake8
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 .
+    - name: imports ordering
+      uses: isort/isort-action@master
+      with:
+        requirementsFiles: "requirements.txt"
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Create env file
+        run: |
+          cp config/.env.example config/.env
+      - name: Create locale file
+        run: |
+          sudo apt-get update
+          sudo apt-get install gettext
+          msgfmt locales/ru/LC_MESSAGES/app.po -o locales/ru/LC_MESSAGES/app.mo
+      - name: Test with pytest
+        run: |
+          python -m pytest

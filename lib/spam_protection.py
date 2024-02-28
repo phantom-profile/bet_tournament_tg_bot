@@ -23,9 +23,9 @@ class SpamProtector:
 
     def decision(self) -> int:
         key = f'{self.PREFIX}::{self.user_id}'
-        count = Red.incr(key)
+        count = Red.conn.incr(key)
         if count == 1:
-            Red.expire(key, self.SECONDS)
+            Red.conn.expire(key, self.SECONDS)
         if count > self.LIMIT:
             return self.FORBID
         if count < self.LIMIT:

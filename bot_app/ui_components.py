@@ -33,3 +33,10 @@ def participant_keyboard():
     status = types.KeyboardButton(text=lc('status button'))
     keyboard.add(make_bet, rules, status)
     return keyboard
+
+
+class Keyboards:
+    PAY = init_payment_keyboard()
+    START = start_keyboard()
+    REQUEST = request_membership_keyboard()
+    MEMBER = participant_keyboard()

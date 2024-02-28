@@ -1,9 +1,22 @@
-pytelegrambotapi
-flask
+# TG
+pyTelegramBotAPI==4.13.0
+
+# Testing
+pytest==8.0.1
+pytest-mock==3.12.0
+fakeredis==2.21.1
+factory-boy==3.2.1
+
+# Linters
+isort==5.13.2
+flake8==6.1.0
+
+# Web
+Flask==2.3.3
+requests==2.31.0
+
+# Tools
+redis==5.0.0
+ipython==8.14.0
 python-dotenv==1.0.0
-flake8
-requests
-redis
-ipython
-sentry-sdk
-isort
+sentry-sdk==1.29.2

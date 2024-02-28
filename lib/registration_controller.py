@@ -4,8 +4,7 @@ from telebot import TeleBot
 from telebot.types import Message, ReplyKeyboardMarkup
 
 from bot_app.message_sender import MessageSender
-from bot_app.ui_components import (participant_keyboard,
-                                   request_membership_keyboard, start_keyboard)
+from bot_app.ui_components import Keyboards
 from bot_app.user import User
 from lib.backend_client import BackendClient
 from lib.current_service import CurrentTournamentsService, Tournament
@@ -31,7 +30,7 @@ class RegistrationController:
         result = GetInstructionsService(self.user, self.tournament).call()
         self.ui.send(message=result.message, keyboard=result.keyboard)
 
-    def block_unlit_pay(self):
+    def block_until_pay(self):
         if self.tournament:
             result = BlockUntilPayService(self.user, self.tournament).call()
         else:
@@ -55,19 +54,19 @@ class RegistrationController:
 
 
 class GetInstructionsService:
-    def __init__(self, user: User, tournament: Tournament):
+    def __init__(self, user: User, tournament: Tournament | None):
         self.user = user
         self.tournament = tournament
 
     def call(self):
         if not self.tournament:
-            text, keyboard = 'registration closed error', start_keyboard()
+            text, keyboard = 'registration closed error', Keyboards.START
         elif self.tournament.is_member(self.user.id):
-            text, keyboard = 'member status', participant_keyboard()
+            text, keyboard = 'member status', Keyboards.MEMBER
         elif self.tournament.is_full():
-            text, keyboard = 'tournament is full error', start_keyboard()
+            text, keyboard = 'tournament is full error', Keyboards.START
         else:
-            text, keyboard = 'register instruction', request_membership_keyboard()
+            text, keyboard = 'register instruction', Keyboards.REQUEST
         return ServiceResult(text, keyboard=keyboard)
 
 
@@ -106,7 +105,7 @@ class SavePaymentService:
         response = self.client.upload_file(self.tournament.id, self.user.id, self._file_content())
         if response.is_successful:
             self.user.activate()
-            return ServiceResult('payment file sent', keyboard=participant_keyboard())
+            return ServiceResult('payment file sent', keyboard=Keyboards.MEMBER)
         else:
             return ServiceResult('default error')
 

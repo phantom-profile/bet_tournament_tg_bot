@@ -3,14 +3,17 @@ from dataclasses import dataclass
 from json import dumps, loads
 from typing import Any, Optional
 
-from redis import Redis
+import redis
 from requests import Response as HttpResponse
 from requests import exceptions
 
 from lib.app_logging import log_text
 
 # Redis documentation - https://redis.io/docs/clients/python/
-Red = Redis(host='localhost', port=6379, decode_responses=True)
+
+
+class Red:
+    conn = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
 
 class CacheService:
@@ -27,18 +30,18 @@ class CacheService:
         self.__key = key
 
     def is_exist(self):
-        return Red.exists(self.key)
+        return Red.conn.exists(self.key) > 0
 
     def get_cached(self):
         if not self.is_exist():
             return None
-        return loads(Red.get(self.key))
+        return loads(Red.conn.get(self.key))
 
     def save(self, jsonable: dict, time: int = None):
         if time:
-            Red.setex(self.key, time, dumps(jsonable))
+            Red.conn.setex(self.key, time, dumps(jsonable))
             return
-        Red.set(self.key, dumps(jsonable))
+        Red.conn.set(self.key, dumps(jsonable))
 
 
 @dataclass
