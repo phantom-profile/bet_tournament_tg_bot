@@ -40,6 +40,7 @@ jobs:
       - name: Create env file
         run: |
           cp config/.env.example config/.env
+          msgfmt locales/ru/LC_MESSAGES/app.po -o locales/ru/LC_MESSAGES/app.mo
       - name: Test with pytest
         run: |
           python -m pytest
