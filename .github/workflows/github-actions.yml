@@ -41,6 +41,11 @@ jobs:
         run: |
           cp config/.env.example config/.env
           msgfmt locales/ru/LC_MESSAGES/app.po -o locales/ru/LC_MESSAGES/app.mo
+      - name: Create locale file
+        run: |
+          sudo apt-get update
+          sudo apt-get install gettext
+          msgfmt locales/ru/LC_MESSAGES/app.po -o locales/ru/LC_MESSAGES/app.mo
       - name: Test with pytest
         run: |
           python -m pytest
