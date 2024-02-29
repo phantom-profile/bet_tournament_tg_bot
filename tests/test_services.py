@@ -1,47 +1,9 @@
 from bot_app.ui_components import Keyboards
 from lib.current_service import CurrentTournamentsService
+from lib.registration_controller import GetInstructionsService, BlockUntilPayService, SavePaymentService
 from lib.spam_protection import SpamProtector
 from lib.status_service import CheckStatusService
-from tests.factories import ResponceFactory, UserFactory
-
-
-def test_status_for_member(success_client, ui_stub):
-    user = UserFactory(member=True)
-    CheckStatusService(user=user, ui=ui_stub).call()
-    ui_stub.send.assert_called_once_with(message='member status', keyboard=Keyboards.MEMBER)
-
-
-def test_status_for_guest(success_client, ui_stub):
-    user = UserFactory(guest=True)
-    CheckStatusService(user=user, ui=ui_stub).call()
-    ui_stub.send.assert_called_once_with(message='viewer status', keyboard=Keyboards.START)
-
-
-def test_status_for_closed_tournament(backend_client, empty_tournament_as_json, ui_stub):
-    user = UserFactory(guest=True)
-    response = ResponceFactory.create(body=empty_tournament_as_json)
-    backend_client.get_current_tournaments.return_value = response
-    CheckStatusService(user=user, ui=ui_stub).call()
-    ui_stub.send.assert_called_once_with(message='registration closed error', keyboard=Keyboards.START)
-
-
-def test_get_current_tournament(success_client, tournament_as_json):
-    result = CurrentTournamentsService().call()
-
-    assert result is not None
-    assert result.name == 't_name'
-    assert result.starts_at.year == 2024
-    assert result.is_full() is False
-    assert result.members_ids == {'1', '2'}
-    assert result.is_member(1) is True
-    assert result.is_member(3) is False
-
-
-def test_get_current_tournament_if_does_not_exist(backend_client, empty_tournament_as_json):
-    response = ResponceFactory.create(body=empty_tournament_as_json)
-    backend_client.get_current_tournaments.return_value = response
-    result = CurrentTournamentsService().call()
-    assert result is None
+from tests.factories import ResponceFactory, UserFactory, TournamentFactory
 
 
 def test_spam_protection_service_allow_warn_and_block():
@@ -50,3 +12,142 @@ def test_spam_protection_service_allow_warn_and_block():
         assert SpamProtector(user_id).decision() == SpamProtector.ALLOW
     assert SpamProtector(user_id).decision() == SpamProtector.WARN
     assert SpamProtector(user_id).decision() == SpamProtector.FORBID
+
+
+class TestStatusService:
+    def call_service(self, user, ui):
+        CheckStatusService(user=user, ui=ui).call()
+
+    def test_for_member(self, success_client, ui_stub):
+        user = UserFactory(member=True)
+        self.call_service(user, ui_stub)
+        ui_stub.send.assert_called_once_with(message='member status', keyboard=Keyboards.MEMBER)
+
+    def test_for_guest(self, success_client, ui_stub):
+        user = UserFactory(guest=True)
+        self.call_service(user, ui_stub)
+        ui_stub.send.assert_called_once_with(message='viewer status', keyboard=Keyboards.START)
+
+    def test_for_closed_tournament(self, ui_stub, empty_tournament_as_json, backend_client):
+        user = UserFactory(guest=True)
+        response = ResponceFactory.create(body=empty_tournament_as_json)
+        backend_client.get_current_tournaments.return_value = response
+        self.call_service(user, ui_stub)
+        ui_stub.send.assert_called_once_with(message='registration closed error', keyboard=Keyboards.START)
+
+
+class TestCurrentTournamentService:
+    def test_success_response(self, success_client):
+        result = CurrentTournamentsService().call()
+
+        assert result is not None
+        assert result.name == 't_name'
+        assert result.starts_at.year == 2024
+        assert result.is_full() is False
+        assert result.members_ids == {'1', '2'}
+        assert result.is_member(1) is True
+        assert result.is_member(3) is False
+
+    def test_if_does_not_exist(self, backend_client, empty_tournament_as_json):
+        response = ResponceFactory.create(body=empty_tournament_as_json)
+        backend_client.get_current_tournaments.return_value = response
+        result = CurrentTournamentsService().call()
+        assert result is None
+
+
+class TestInstructionsService:
+    def setup_method(self, _method=None, limit=3, tg_id=1):
+        self.tournament = TournamentFactory.create(members_limit=limit)
+        self.user = UserFactory.create(tg_id=tg_id)
+
+    def call_service(self):
+        return GetInstructionsService(user=self.user, tournament=self.tournament).call()
+
+    def test_no_tournament(self):
+        self.tournament = None
+        result = self.call_service()
+        assert result.message == 'registration closed error'
+        assert result.keyboard == Keyboards.START
+
+    def test_member(self):
+        result = self.call_service()
+        assert result.message == 'member status'
+        assert result.keyboard == Keyboards.MEMBER
+
+    def test_full(self):
+        self.setup_method(tg_id=10)
+        result = self.call_service()
+        assert result.message == 'tournament is full error'
+        assert result.keyboard == Keyboards.START
+
+    def test_request_membership(self):
+        self.setup_method(limit=5, tg_id=10)
+        result = self.call_service()
+        assert result.message == 'register instruction'
+        assert result.keyboard == Keyboards.REQUEST
+
+
+class TestBlockUntilPayService:
+    def setup_method(self, _method):
+        self.tournament = TournamentFactory.create(members_limit=5)
+        self.user = UserFactory.create(tg_id=10)
+
+    def call_service(self):
+        return BlockUntilPayService(user=self.user, tournament=self.tournament).call()
+
+    def test_success_registration(self, success_client):
+        result = self.call_service()
+
+        success_client.register.assert_called_once_with(
+            user_id=self.user.id,
+            user_name=self.user.nick,
+            current=self.tournament.id
+        )
+        assert self.user.is_on_hold is True
+        assert result.message == 'payment request message'
+        assert result.keyboard is None
+
+    def test_failed_registration(self, backend_client):
+        response = ResponceFactory.create(failed=True)
+        backend_client.register.return_value = response
+        result = self.call_service()
+
+        backend_client.register.assert_called_once_with(
+            user_id=self.user.id,
+            user_name=self.user.nick,
+            current=self.tournament.id
+        )
+        assert self.user.is_on_hold is False
+        assert result.message == 'default error'
+        assert result.keyboard is None
+
+
+class TestSavePaymentService:
+    def test_no_file_need(self):
+        pass
+
+    def test_no_file_exists(self):
+        pass
+
+    def test_file_too_big(self):
+        pass
+
+    def test_success_upload(self):
+        pass
+
+    def test_failed_upload(self):
+        pass
+
+
+class TestRegistrationController:
+    def test_get_instructions(self):
+        pass
+
+    def test_block_until_pay(self):
+        pass
+
+    def test_block_until_pay_if_no_tournament(self):
+        pass
+
+    def test_pay(self):
+        pass

@@ -46,4 +46,6 @@ def empty_tournament_as_json():
 def success_client(backend_client, tournament_as_json, empty_tournament_as_json):
     response = ResponceFactory.create(body=tournament_as_json)
     backend_client.get_current_tournaments.return_value = response
+    response = ResponceFactory.create(body={}, status=201)
+    backend_client.register.return_value = response
     return backend_client
