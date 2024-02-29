@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from telebot import TeleBot
-from telebot.types import Message, ReplyKeyboardMarkup
+from telebot.types import Message, ReplyKeyboardMarkup, Document
 
 from bot_app.message_sender import MessageSender
 from bot_app.ui_components import Keyboards
@@ -90,7 +90,7 @@ class BlockUntilPayService:
 
 
 class SavePaymentService:
-    def __init__(self, user: User, tournament: Tournament, file, bot: TeleBot):
+    def __init__(self, user: User, tournament: Tournament, file: Document, bot: TeleBot):
         self.client = BackendClient()
         self.user = user
         self.tournament = tournament
