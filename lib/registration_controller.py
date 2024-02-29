@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from telebot import TeleBot
-from telebot.types import Message, ReplyKeyboardMarkup, Document
+from telebot.types import Document, Message, ReplyKeyboardMarkup
 
 from bot_app.message_sender import MessageSender
 from bot_app.ui_components import Keyboards

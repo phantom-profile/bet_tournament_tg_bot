@@ -1,9 +1,11 @@
 from bot_app.ui_components import Keyboards
 from lib.current_service import CurrentTournamentsService
-from lib.registration_controller import GetInstructionsService, BlockUntilPayService, SavePaymentService
+from lib.registration_controller import (BlockUntilPayService,
+                                         GetInstructionsService,
+                                         SavePaymentService)
 from lib.spam_protection import SpamProtector
 from lib.status_service import CheckStatusService
-from tests.factories import ResponceFactory, UserFactory, TournamentFactory
+from tests.factories import ResponceFactory, TournamentFactory, UserFactory
 
 
 def test_spam_protection_service_allow_warn_and_block():
