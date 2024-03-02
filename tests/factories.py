@@ -1,7 +1,6 @@
 import factory
 import faker
-
-from telebot.types import Document
+from telebot.types import Chat, Document, File, Message
 
 from bot_app.user import User
 from lib.base_client import Response
@@ -83,4 +82,35 @@ class DocumentFactory(factory.Factory):
 
     @classmethod
     def create(cls, **kwargs) -> Document:
+        return super().create(**kwargs)
+
+
+class MessageFactory(factory.Factory):
+    class Meta:
+        model = Message
+
+    message_id = factory.LazyAttribute(lambda _: '1234-1234')
+    chat = factory.LazyAttribute(lambda _: Chat(id='1234', type='chat'))
+    from_user = factory.LazyAttribute(lambda _: UserFactory.create())
+    content_type = factory.LazyAttribute(lambda _: 'text')
+    json_string = factory.LazyAttribute(lambda _: '{}')
+    date = factory.LazyAttribute(lambda _: factory.Faker('datetime'))
+    options = factory.LazyAttribute(lambda _: [])
+
+    @classmethod
+    def create(cls, **kwargs) -> Message:
+        return super().create(**kwargs)
+
+
+class FileFactory(factory.Factory):
+    class Meta:
+        model = File
+
+    file_id = factory.LazyAttribute(lambda _: '1234-1234')
+    file_path = factory.LazyAttribute(lambda _: '1234-1234')
+    file_unique_id = factory.LazyAttribute(lambda _: '1234-1234')
+    file_size = factory.LazyAttribute(lambda _: 1024)
+
+    @classmethod
+    def create(cls, **kwargs) -> File:
         return super().create(**kwargs)

@@ -3,13 +3,13 @@ import json
 import fakeredis
 import pytest
 from pytest_mock import MockerFixture
+from telebot import TeleBot
 
 from bot_app.message_sender import MessageSender
 from config.setup import BASE_DIR
 from lib import base_client
 from lib.backend_client import BackendClient
-from lib.registration_controller import GetFileService
-from tests.factories import ResponceFactory
+from tests.factories import FileFactory, ResponceFactory
 
 
 @pytest.fixture(autouse=True)
@@ -20,14 +20,8 @@ def patch_redis_global(monkeypatch):
 
 @pytest.fixture
 def ui_stub(mocker):
-    return mocker.MagicMock(spec=MessageSender)
-
-
-@pytest.fixture
-def downloader_stub(mocker):
-    mock_service = mocker.MagicMock(spec=GetFileService)
-    mocker.patch.object(GetFileService, "__new__", return_value=mock_service)
-    mock_service.call.return_value = b'content'
+    mock_service = mocker.MagicMock(spec=MessageSender)
+    mocker.patch.object(MessageSender, "__new__", return_value=mock_service)
     return mock_service
 
 
@@ -36,6 +30,15 @@ def backend_client(mocker: MockerFixture):
     mock_client = mocker.MagicMock(spec=BackendClient)
     # Patch the creation of new BackendClient instances to return the mock_client
     mocker.patch.object(BackendClient, "__new__", return_value=mock_client)
+    return mock_client
+
+
+@pytest.fixture
+def bot_stub(mocker: MockerFixture):
+    mock_client = mocker.MagicMock(spec=TeleBot)
+    mocker.patch.object(TeleBot, "__new__", return_value=mock_client)
+    mock_client.get_file.return_value = FileFactory.create()
+    mock_client.download_file.return_value = b'content'
     return mock_client
 
 

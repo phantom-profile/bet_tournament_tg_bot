@@ -3,9 +3,9 @@ from time import sleep
 
 from flask import Flask, request
 
+from bot_app.message_sender import MessageSender
 from config.setup import env_variables
 from event_handlers import bot
-from bot_app.message_sender import MessageSender
 
 app = Flask(__name__)
 

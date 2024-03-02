@@ -43,7 +43,7 @@ class CurrentTournamentsService:
 
     def call(self) -> Tournament | None:
         response = self.client.get_current_tournaments()
-        if not response.body['open_tournament_exists']:
+        if not response.body.get('open_tournament_exists'):
             return None
 
         return self._build_tournament(response.body)

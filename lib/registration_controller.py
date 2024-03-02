@@ -18,6 +18,16 @@ class ServiceResult:
     keyboard: ReplyKeyboardMarkup | None = None
 
 
+class GetFileService:
+    def __init__(self, bot: TeleBot, file: Document):
+        self.bot = bot
+        self.file = file
+
+    def call(self):
+        file_info = self.bot.get_file(self.file.file_id)
+        return self.bot.download_file(file_info.file_path)
+
+
 class RegistrationController:
     def __init__(self, user: User, message: Message, bot: TeleBot):
         self.client = BackendClient()
@@ -87,16 +97,6 @@ class BlockUntilPayService:
             self.user.activate()
             return ServiceResult('default error')
         return ServiceResult('payment request message')
-
-
-class GetFileService:
-    def __init__(self, bot: TeleBot, file: Document):
-        self.bot = bot
-        self.file = file
-
-    def call(self):
-        file_info = self.bot.get_file(self.file.file_id)
-        return self.bot.download_file(file_info.file_path)
 
 
 class SavePaymentService:

@@ -1,11 +1,13 @@
 from bot_app.ui_components import Keyboards
 from lib.current_service import CurrentTournamentsService
-from lib.registration_controller import (BlockUntilPayService,
+from lib.registration_controller import (BlockUntilPayService, GetFileService,
                                          GetInstructionsService,
-                                         SavePaymentService,)
+                                         RegistrationController,
+                                         SavePaymentService)
 from lib.spam_protection import SpamProtector
 from lib.status_service import CheckStatusService
-from tests.factories import ResponceFactory, TournamentFactory, UserFactory, DocumentFactory
+from tests.factories import (DocumentFactory, MessageFactory, ResponceFactory,
+                             TournamentFactory, UserFactory)
 
 
 def test_spam_protection_service_allow_warn_and_block():
@@ -129,53 +131,66 @@ class TestSavePaymentService:
         self.tournament = TournamentFactory.create()
         self.document = DocumentFactory.create()
 
-    def call_service(self, downloader):
+    def call_service(self, bot):
+        downloader = GetFileService(bot, self.document)
         self.result = SavePaymentService(self.user, self.tournament, self.document, downloader).call()
 
-    def test_no_file_need(self, success_client, downloader_stub):
+    def test_no_file_need(self, success_client, bot_stub):
         self.user.activate()
-        self.call_service(downloader_stub)
+        self.call_service(bot_stub)
         success_client.upload_file.assert_not_called()
         assert self.result.message == 'no file need error'
         assert self.user.is_active is True
 
-    def test_no_file_exists(self, success_client, downloader_stub):
+    def test_no_file_exists(self, success_client, bot_stub):
         self.document = None
-        self.call_service(downloader_stub)
+        self.call_service(bot_stub)
         success_client.upload_file.assert_not_called()
         assert self.result.message == 'no file exists error'
         assert self.user.is_active is False
 
-    def test_file_too_big(self, success_client, downloader_stub):
+    def test_file_too_big(self, success_client, bot_stub):
         self.document = DocumentFactory.create(file_size=1024 * 1024 + 1)
-        self.call_service(downloader_stub)
+        self.call_service(bot_stub)
         success_client.upload_file.assert_not_called()
         assert self.result.message == 'file size limit error'
         assert self.user.is_active is False
 
-    def test_success_upload(self, success_client, downloader_stub):
-        self.call_service(downloader_stub)
+    def test_success_upload(self, success_client, bot_stub):
+        self.call_service(bot_stub)
         success_client.upload_file.assert_called_once_with(self.tournament.id, self.user.id, b'content')
         assert self.result.message == 'payment file sent'
         assert self.user.is_active is True
         assert self.result.keyboard == Keyboards.MEMBER
 
-    def test_failed_upload(self, failed_client, downloader_stub):
-        self.call_service(downloader_stub)
+    def test_failed_upload(self, failed_client, bot_stub):
+        self.call_service(bot_stub)
         failed_client.upload_file.assert_called()
         assert self.result.message == 'default error'
         assert self.user.is_active is False
 
 
 class TestRegistrationController:
-    def test_get_instructions(self):
-        pass
+    def setup_method(self, _method):
+        self.user = UserFactory.create()
+        self.message = MessageFactory.create()
 
-    def test_block_until_pay(self):
-        pass
+    def service(self, bot):
+        return RegistrationController(self.user, self.message, bot)
 
-    def test_block_until_pay_if_no_tournament(self):
-        pass
+    def test_get_instructions(self, ui_stub, bot_stub, success_client):
+        self.service(bot_stub).get_instructions()
+        ui_stub.send.assert_called_once_with(message='register instruction', keyboard=Keyboards.REQUEST)
 
-    def test_pay(self):
-        pass
+    def test_block_until_pay_if_tournament(self, ui_stub, bot_stub, success_client):
+        self.service(bot_stub).block_until_pay()
+        ui_stub.send.assert_called_once_with(message='payment request message', keyboard=None)
+
+    def test_block_until_pay_if_no_tournament(self, ui_stub, bot_stub, failed_client):
+        self.service(bot_stub).block_until_pay()
+        ui_stub.send.assert_called_once_with(message='registration closed error', keyboard=Keyboards.START)
+
+    def test_pay(self, ui_stub, bot_stub, success_client):
+        self.user.block()
+        self.service(bot_stub).pay()
+        ui_stub.send.assert_called_once_with(message='no file exists error', keyboard=None)
