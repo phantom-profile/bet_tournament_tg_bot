@@ -8,7 +8,7 @@ class User:
 
     @property
     def is_on_hold(self) -> bool:
-        return Red.conn.exists(self._lock_key)
+        return bool(Red.conn.exists(self._lock_key))
 
     @property
     def is_active(self) -> bool:

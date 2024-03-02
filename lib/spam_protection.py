@@ -24,14 +24,13 @@ class SpamProtector:
     def decision(self) -> int:
         key = f'{self.PREFIX}::{self.user_id}'
         count = Red.conn.incr(key)
-        if count == 1:
-            Red.conn.expire(key, self.SECONDS)
         if count > self.LIMIT:
             return self.FORBID
-        if count < self.LIMIT:
-            return self.ALLOW
         if count == self.LIMIT:
             return self.WARN
+        if count == 1:
+            Red.conn.expire(key, self.SECONDS)
+        return self.ALLOW
 
 
 def control_rate_limit(tg_bot: TeleBot):
