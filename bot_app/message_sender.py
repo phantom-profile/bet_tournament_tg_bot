@@ -13,5 +13,8 @@ class MessageSender:
         self.sender = sender
         self.chat_id = chat_id
 
-    def send(self, message, keyboard=None):
+    def send(self, message: str, keyboard=None):
         self.sender.send_message(text=lc(message), chat_id=self.chat_id, reply_markup=keyboard)
+
+    def send_raw(self, message: str):
+        self.sender.send_message(text=message, chat_id=self.chat_id)

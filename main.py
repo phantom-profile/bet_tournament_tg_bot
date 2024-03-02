@@ -5,6 +5,7 @@ from flask import Flask, request
 
 from config.setup import env_variables
 from event_handlers import bot
+from bot_app.message_sender import MessageSender
 
 app = Flask(__name__)
 
@@ -32,9 +33,10 @@ class SendMessagesService:
             self.response, self.status = {'errors': self.errors}, 400
             return
         for chat_id in self.chat_ids:
-            bot.send_message(chat_id, f'{self.message}')
+            MessageSender(bot, chat_id).send_raw(self.message)
             sleep(0.2)
-        self.response, self.status = {'chat_ids': self.chat_ids, 'message': self.message}, 200
+        self.response = {'chat_ids': self.chat_ids, 'message': self.message}
+        self.status = 200
 
 
 @app.route('/tgsend', methods=['POST'])
