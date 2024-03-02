@@ -8,6 +8,7 @@ from bot_app.message_sender import MessageSender
 from config.setup import BASE_DIR
 from lib import base_client
 from lib.backend_client import BackendClient
+from lib.registration_controller import GetFileService
 from tests.factories import ResponceFactory
 
 
@@ -20,6 +21,14 @@ def patch_redis_global(monkeypatch):
 @pytest.fixture
 def ui_stub(mocker):
     return mocker.MagicMock(spec=MessageSender)
+
+
+@pytest.fixture
+def downloader_stub(mocker):
+    mock_service = mocker.MagicMock(spec=GetFileService)
+    mocker.patch.object(GetFileService, "__new__", return_value=mock_service)
+    mock_service.call.return_value = b'content'
+    return mock_service
 
 
 @pytest.fixture
@@ -48,4 +57,14 @@ def success_client(backend_client, tournament_as_json, empty_tournament_as_json)
     backend_client.get_current_tournaments.return_value = response
     response = ResponceFactory.create(body={}, status=201)
     backend_client.register.return_value = response
+    backend_client.upload_file.return_value = response
+    return backend_client
+
+
+@pytest.fixture
+def failed_client(backend_client):
+    response = ResponceFactory.create(failed=True)
+    backend_client.get_current_tournaments.return_value = response
+    backend_client.register.return_value = response
+    backend_client.upload_file.return_value = response
     return backend_client

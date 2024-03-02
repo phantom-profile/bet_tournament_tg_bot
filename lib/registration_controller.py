@@ -42,7 +42,7 @@ class RegistrationController:
             user=self.user,
             tournament=self.tournament,
             file=self.message.document,
-            bot=self.bot
+            downloader=GetFileService(self.bot, self.message.document)
         ).call()
         self.ui.send(message=result.message, keyboard=result.keyboard)
 
@@ -89,20 +89,30 @@ class BlockUntilPayService:
         return ServiceResult('payment request message')
 
 
+class GetFileService:
+    def __init__(self, bot: TeleBot, file: Document):
+        self.bot = bot
+        self.file = file
+
+    def call(self):
+        file_info = self.bot.get_file(self.file.file_id)
+        return self.bot.download_file(file_info.file_path)
+
+
 class SavePaymentService:
-    def __init__(self, user: User, tournament: Tournament, file: Document, bot: TeleBot):
+    def __init__(self, user: User, tournament: Tournament, file: Document, downloader: GetFileService):
         self.client = BackendClient()
         self.user = user
         self.tournament = tournament
         self.file = file
-        self.bot = bot
+        self.downloader = downloader
 
     def call(self):
         register_error = self._register_error()
         if register_error:
             return ServiceResult(register_error)
 
-        response = self.client.upload_file(self.tournament.id, self.user.id, self._file_content())
+        response = self.client.upload_file(self.tournament.id, self.user.id, self.downloader.call())
         if response.is_successful:
             self.user.activate()
             return ServiceResult('payment file sent', keyboard=Keyboards.MEMBER)
@@ -118,7 +128,3 @@ class SavePaymentService:
 
         if self.file.file_size > MB:
             return 'file size limit error'
-
-    def _file_content(self):
-        file_info = self.bot.get_file(self.file.file_id)
-        return self.bot.download_file(file_info.file_path)

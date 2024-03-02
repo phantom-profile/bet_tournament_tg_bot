@@ -1,6 +1,8 @@
 import factory
 import faker
 
+from telebot.types import Document
+
 from bot_app.user import User
 from lib.base_client import Response
 from lib.current_service import Tournament
@@ -23,6 +25,10 @@ class ResponceFactory(factory.Factory):
             body={"error": "error on server happened"}
         )
 
+    @classmethod
+    def create(cls, **kwargs) -> Response:
+        return super().create(**kwargs)
+
     @factory.lazy_attribute
     def is_successful(self):
         return 200 <= self.status <= 299
@@ -39,6 +45,10 @@ class UserFactory(factory.Factory):
         member = factory.Trait(tg_id=1)
         guest = factory.Trait(tg_id=3)
 
+    @classmethod
+    def create(cls, **kwargs) -> User:
+        return super().create(**kwargs)
+
 
 class TournamentFactory(factory.Factory):
     class Meta:
@@ -53,6 +63,24 @@ class TournamentFactory(factory.Factory):
     starts_at = factory.LazyAttribute(lambda _: generator.future_datetime())
     members_ids = factory.LazyAttribute(lambda _: {'1', '2', '3'})
 
+    @classmethod
+    def create(cls, **kwargs) -> Tournament:
+        return super().create(**kwargs)
+
     @factory.lazy_attribute
     def members_count(self):
         return len(self.members_ids)
+
+
+class DocumentFactory(factory.Factory):
+    class Meta:
+        model = Document
+
+    file_id = factory.LazyAttribute(lambda _: '1234-1234')
+    file_unique_id = factory.LazyAttribute(lambda _: '1234-1234')
+    file_name = factory.LazyAttribute(lambda _: 'file.pdf')
+    file_size = factory.LazyAttribute(lambda _: 1024)
+
+    @classmethod
+    def create(cls, **kwargs) -> Document:
+        return super().create(**kwargs)

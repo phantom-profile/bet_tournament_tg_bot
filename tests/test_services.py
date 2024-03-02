@@ -2,10 +2,10 @@ from bot_app.ui_components import Keyboards
 from lib.current_service import CurrentTournamentsService
 from lib.registration_controller import (BlockUntilPayService,
                                          GetInstructionsService,
-                                         SavePaymentService)
+                                         SavePaymentService,)
 from lib.spam_protection import SpamProtector
 from lib.status_service import CheckStatusService
-from tests.factories import ResponceFactory, TournamentFactory, UserFactory
+from tests.factories import ResponceFactory, TournamentFactory, UserFactory, DocumentFactory
 
 
 def test_spam_protection_service_allow_warn_and_block():
@@ -109,12 +109,10 @@ class TestBlockUntilPayService:
         assert result.message == 'payment request message'
         assert result.keyboard is None
 
-    def test_failed_registration(self, backend_client):
-        response = ResponceFactory.create(failed=True)
-        backend_client.register.return_value = response
+    def test_failed_registration(self, failed_client):
         result = self.call_service()
 
-        backend_client.register.assert_called_once_with(
+        failed_client.register.assert_called_once_with(
             user_id=self.user.id,
             user_name=self.user.nick,
             current=self.tournament.id
@@ -125,20 +123,48 @@ class TestBlockUntilPayService:
 
 
 class TestSavePaymentService:
-    def test_no_file_need(self):
-        pass
+    def setup_method(self, _method):
+        self.user = UserFactory.create()
+        self.user.block()
+        self.tournament = TournamentFactory.create()
+        self.document = DocumentFactory.create()
 
-    def test_no_file_exists(self):
-        pass
+    def call_service(self, downloader):
+        self.result = SavePaymentService(self.user, self.tournament, self.document, downloader).call()
 
-    def test_file_too_big(self):
-        pass
+    def test_no_file_need(self, success_client, downloader_stub):
+        self.user.activate()
+        self.call_service(downloader_stub)
+        success_client.upload_file.assert_not_called()
+        assert self.result.message == 'no file need error'
+        assert self.user.is_active is True
 
-    def test_success_upload(self):
-        pass
+    def test_no_file_exists(self, success_client, downloader_stub):
+        self.document = None
+        self.call_service(downloader_stub)
+        success_client.upload_file.assert_not_called()
+        assert self.result.message == 'no file exists error'
+        assert self.user.is_active is False
 
-    def test_failed_upload(self):
-        pass
+    def test_file_too_big(self, success_client, downloader_stub):
+        self.document = DocumentFactory.create(file_size=1024 * 1024 + 1)
+        self.call_service(downloader_stub)
+        success_client.upload_file.assert_not_called()
+        assert self.result.message == 'file size limit error'
+        assert self.user.is_active is False
+
+    def test_success_upload(self, success_client, downloader_stub):
+        self.call_service(downloader_stub)
+        success_client.upload_file.assert_called_once_with(self.tournament.id, self.user.id, b'content')
+        assert self.result.message == 'payment file sent'
+        assert self.user.is_active is True
+        assert self.result.keyboard == Keyboards.MEMBER
+
+    def test_failed_upload(self, failed_client, downloader_stub):
+        self.call_service(downloader_stub)
+        failed_client.upload_file.assert_called()
+        assert self.result.message == 'default error'
+        assert self.user.is_active is False
 
 
 class TestRegistrationController:
