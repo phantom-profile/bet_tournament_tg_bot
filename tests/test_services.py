@@ -60,7 +60,7 @@ class TestCurrentTournamentService:
 
 
 class TestInstructionsService:
-    def setup_method(self, _method=None, limit=3, tg_id=1):
+    def setup_method(self, limit=3, tg_id=1):
         self.tournament = TournamentFactory.create(members_limit=limit)
         self.user = UserFactory.create(tg_id=tg_id)
 
@@ -92,7 +92,7 @@ class TestInstructionsService:
 
 
 class TestBlockUntilPayService:
-    def setup_method(self, _method):
+    def setup_method(self):
         self.tournament = TournamentFactory.create(members_limit=5)
         self.user = UserFactory.create(tg_id=10)
 
@@ -125,7 +125,7 @@ class TestBlockUntilPayService:
 
 
 class TestSavePaymentService:
-    def setup_method(self, _method):
+    def setup_method(self):
         self.user = UserFactory.create()
         self.user.block()
         self.tournament = TournamentFactory.create()
@@ -171,7 +171,7 @@ class TestSavePaymentService:
 
 
 class TestRegistrationController:
-    def setup_method(self, _method):
+    def setup_method(self):
         self.user = UserFactory.create()
         self.message = MessageFactory.create()
 
