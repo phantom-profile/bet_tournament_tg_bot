@@ -1,16 +1,18 @@
+from os import getenv
+
 from telebot import TeleBot
 from telebot.types import Message
 
 from bot_app.message_sender import MessageSender
 from bot_app.ui_components import Keyboards
 from bot_app.user import User
-from config.setup import env_variables, lc
+from config.setup import lc
 from lib.app_logging import log_tg_message, logger_factory
 from lib.registration_controller import RegistrationController
 from lib.spam_protection import control_rate_limit
 from lib.status_service import CheckStatusService
 
-bot = TeleBot(env_variables.get('TG_BOT_TOKEN'), parse_mode=None)
+bot = TeleBot(getenv('TG_BOT_TOKEN'), parse_mode=None)
 logger = logger_factory()
 protector = control_rate_limit(bot)
 

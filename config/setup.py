@@ -1,11 +1,13 @@
 import gettext
 import logging
+from os import getenv
+
 from json import load
 from pathlib import Path
 from typing import Callable
 
 import sentry_sdk
-from dotenv import dotenv_values
+from dotenv import load_dotenv
 from sentry_sdk.integrations.logging import ignore_logger
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -49,7 +51,7 @@ class Config:
 
 
 app_conf = Config()
-env_variables = dotenv_values(app_conf.ENV_FILE)
+load_dotenv(app_conf.ENV_FILE)
 
 
 def set_locale() -> Callable[[str], str]:
@@ -68,12 +70,12 @@ def set_logger():
 set_logger()
 logging.info('locale file initialize')
 lc = set_locale()
-if env_variables.get('SENTRY_TOKEN') and app_conf.is_production:
+if getenv('SENTRY_TOKEN') and app_conf.is_production:
     logging.info('sentry initialize')
 
     ignore_logger("TeleBot")
     sentry_sdk.init(
-        dsn=env_variables.get('SENTRY_TOKEN'),
+        dsn=getenv('SENTRY_TOKEN'),
         # percentage of sent to Sentry errors
         traces_sample_rate=app_conf.traces_sample_rate,
     )

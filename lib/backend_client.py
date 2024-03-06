@@ -1,12 +1,12 @@
-import requests
+from os import getenv
 
-from config.setup import env_variables
+import requests
 from lib.base_client import BaseClient
 
 
 class BackendClient(BaseClient):
-    URL = f"{env_variables.get('BACKEND_URL')}/api/private"
-    TOKEN = env_variables.get('BACKEND_TOKEN')
+    URL = f"{getenv('BACKEND_URL')}/api/private"
+    TOKEN = getenv('BACKEND_TOKEN')
 
     def check_status(self, user_id: int, current: int):
         self._response = requests.get(
