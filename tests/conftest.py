@@ -13,8 +13,9 @@ from tests.factories import FileFactory, ResponceFactory
 
 
 @pytest.fixture(autouse=True)
-def patch_redis_global(monkeypatch):
+def prepare_infra(monkeypatch):
     # Patch the 'Red' global variable with the fake Redis client
+    monkeypatch.setenv('API_ACCESS_TOKEN', 'TEST_TOKEN')
     monkeypatch.setattr(base_client.Red, 'conn', fakeredis.FakeRedis())
 
 
