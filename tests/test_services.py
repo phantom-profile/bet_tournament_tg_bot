@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from bot_app.ui_components import Keyboards
 from lib.current_service import CurrentTournamentsService
 from lib.registration_controller import (BlockUntilPayService, GetFileService,
@@ -8,6 +10,7 @@ from lib.spam_protection import SpamProtector
 from lib.status_service import CheckStatusService
 from tests.factories import (DocumentFactory, MessageFactory, ResponceFactory,
                              TournamentFactory, UserFactory)
+from api import SendMessagesService
 
 
 def test_spam_protection_service_allow_warn_and_block():
@@ -194,3 +197,39 @@ class TestRegistrationController:
         self.user.block()
         self.service(bot_stub).pay()
         ui_stub.send.assert_called_once_with(message='no file exists error', keyboard=None)
+
+
+@patch('time.sleep', return_value=None)
+class TestSendMessagesService:
+    def setup_method(self):
+        self.token = 'TEST_TOKEN'
+        self.message = 'text'
+        self.chat_ids = [1, 2]
+
+    def call_service(self):
+        service = SendMessagesService(chat_ids=self.chat_ids, message=self.message, token=self.token)
+        service.call()
+        return service
+
+    def test_success(self, _mock_sleep, ui_stub):
+        result = self.call_service()
+
+        assert result.errors == []
+        assert result.status == 200
+        assert result.response == {'chat_ids': self.chat_ids, 'message': self.message}
+
+    def test_invalid_token(self, _mock_sleep, ui_stub):
+        self.token = 'INVALID'
+        self.message = 1
+        result = self.call_service()
+
+        assert result.status == 400
+        assert result.response == {'errors': [result.INVALID_TOKEN]}
+
+    def test_invalid_params(self, _mock_sleep, ui_stub):
+        self.message = 1
+        self.chat_ids = 'string'
+        result = self.call_service()
+
+        assert result.status == 400
+        assert result.response == {'errors': [result.INVALID_IDS, result.INVALID_TEXT]}
