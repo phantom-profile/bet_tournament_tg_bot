@@ -1,6 +1,7 @@
 from os import getenv
 
 import requests
+
 from lib.base_client import BaseClient
 
 

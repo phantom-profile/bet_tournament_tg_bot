@@ -1,8 +1,7 @@
 import gettext
 import logging
-from os import getenv
-
 from json import load
+from os import getenv
 from pathlib import Path
 from typing import Callable
 

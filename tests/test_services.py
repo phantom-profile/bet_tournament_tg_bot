@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+from api import SendMessagesService
 from bot_app.ui_components import Keyboards
 from lib.current_service import CurrentTournamentsService
 from lib.registration_controller import (BlockUntilPayService, GetFileService,
@@ -10,7 +11,6 @@ from lib.spam_protection import SpamProtector
 from lib.status_service import CheckStatusService
 from tests.factories import (DocumentFactory, MessageFactory, ResponceFactory,
                              TournamentFactory, UserFactory)
-from api import SendMessagesService
 
 
 def test_spam_protection_service_allow_warn_and_block():
